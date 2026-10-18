@@ -26,7 +26,11 @@ def seconds_to_hms(seconds):
     Hours are not padded; minutes and seconds are always two digits.
     Hint: `//` and `%`, then an f-string with `:02d`.
     """
-    raise NotImplementedError
+    hours = seconds // 3600
+    rest = seconds % 3600
+    minutes = rest // 60
+    secs = rest % 60
+    return f"{hours}:{minutes:02d}:{secs:02d}"
 
 
 def celsius_to_fahrenheit(celsius):
@@ -38,7 +42,7 @@ def celsius_to_fahrenheit(celsius):
     celsius_to_fahrenheit(-40)   -> -40.0
     celsius_to_fahrenheit(36.6)  -> 97.9
     """
-    raise NotImplementedError
+    return round(celsius * 9 / 5 + 32, 1)
 
 
 def split_evenly(total, people):
@@ -50,7 +54,7 @@ def split_evenly(total, people):
     split_evenly(90, 3)  -> (30, 0)
     split_evenly(5, 8)   -> (0, 5)
     """
-    raise NotImplementedError
+    return total // people, total % people
 
 
 # -- strings ----------------------------------------------------------------
@@ -65,7 +69,10 @@ def initials(full_name):
 
     Extra spaces anywhere are ignored. Hint: `str.split()` with no argument.
     """
-    raise NotImplementedError
+    result = ""
+    for word in full_name.split():
+        result += word[0].upper() + "."
+    return result
 
 
 def is_palindrome_word(word):
@@ -78,7 +85,8 @@ def is_palindrome_word(word):
 
     Hint: one slice does the reversing.
     """
-    raise NotImplementedError
+    cleaned = word.strip().lower()
+    return cleaned == cleaned[::-1]
 
 
 def mask_email(email):
@@ -93,7 +101,12 @@ def mask_email(email):
 
     Hint: `str.index("@")`, slicing, and `"*" * n`.
     """
-    raise NotImplementedError
+    at = email.index("@")
+    name = email[:at]
+    domain = email[at:]
+    if len(name) <= 2:
+        return email
+    return name[0] + "*" * (len(name) - 2) + name[-1] + domain
 
 
 # -- lists ------------------------------------------------------------------
@@ -110,7 +123,8 @@ def middle(values):
 
     One slice is enough — no `if` needed.
     """
-    raise NotImplementedError
+    n = len(values)
+    return values[(n - 1) // 2 : n // 2 + 1]
 
 
 def rotate_left(values, k):
@@ -122,7 +136,10 @@ def rotate_left(values, k):
     rotate_left([1, 2, 3], 4)        -> [2, 3, 1]
     rotate_left([], 3)               -> []
     """
-    raise NotImplementedError
+    if not values:
+        return []
+    k = k % len(values)
+    return values[k:] + values[:k]
 
 
 def fib_list(n):
@@ -134,7 +151,12 @@ def fib_list(n):
 
     Hint: the tutorial's `while` loop, with `a, b = b, a + b`.
     """
-    raise NotImplementedError
+    result = []
+    a, b = 0, 1
+    while len(result) < n:
+        result.append(a)
+        a, b = b, a + b
+    return result
 
 
 def collatz_steps(n):
@@ -146,4 +168,11 @@ def collatz_steps(n):
     collatz_steps(6)  -> 8     6 3 10 5 16 8 4 2 1
     collatz_steps(27) -> 111
     """
-    raise NotImplementedError
+    steps = 0
+    while n != 1:
+        if n % 2 == 0:
+            n = n // 2
+        else:
+            n = 3 * n + 1
+        steps += 1
+    return steps
