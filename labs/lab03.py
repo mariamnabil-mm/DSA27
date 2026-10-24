@@ -21,7 +21,13 @@ def unique_in_order(values):
 
     Must be O(n): keep a set of what you have already seen.
     """
-    raise NotImplementedError
+    seen = set()
+    result = []
+    for v in values:
+        if v not in seen:
+            seen.add(v)
+            result.append(v)
+    return result
 
 
 def word_frequencies(text):
@@ -34,7 +40,13 @@ def word_frequencies(text):
     word_frequencies("The cat. the HAT!")  -> {"the": 2, "cat": 1, "hat": 1}
     word_frequencies("")                   -> {}
     """
-    raise NotImplementedError
+    freq = {}
+    for word in text.split():
+        word = word.lower().strip(".,;:!?")
+        if word == "":
+            continue
+        freq[word] = freq.get(word, 0) + 1
+    return freq
 
 
 def top_k(frequencies, k):
@@ -47,7 +59,8 @@ def top_k(frequencies, k):
 
     Hint: `sorted` with a `key` that returns a tuple.
     """
-    raise NotImplementedError
+    ordered = sorted(frequencies.items(), key=lambda pair: (-pair[1], pair[0]))
+    return ordered[:k]
 
 
 def transpose(matrix):
@@ -59,7 +72,9 @@ def transpose(matrix):
 
     Write it as a nested list comprehension.
     """
-    raise NotImplementedError
+    if not matrix:
+        return []
+    return [[row[j] for row in matrix] for j in range(len(matrix[0]))]
 
 
 def invert(mapping):
@@ -69,7 +84,12 @@ def invert(mapping):
 
     invert({"a": 1, "b": 2, "c": 1})  -> {1: ["a", "c"], 2: ["b"]}
     """
-    raise NotImplementedError
+    result = {}
+    for key, value in mapping.items():
+        result.setdefault(value, []).append(key)
+    for keys in result.values():
+        keys.sort()
+    return result
 
 
 def common_elements(first, second):
@@ -77,7 +97,7 @@ def common_elements(first, second):
 
     common_elements([3, 1, 2, 3], [3, 4, 1])  -> [1, 3]
     """
-    raise NotImplementedError
+    return sorted(set(first) & set(second))
 
 
 def group_by_length(words):
@@ -86,7 +106,10 @@ def group_by_length(words):
     group_by_length(["hi", "sun", "to", "sky"])
         -> {2: ["hi", "to"], 3: ["sun", "sky"]}
     """
-    raise NotImplementedError
+    groups = {}
+    for w in words:
+        groups.setdefault(len(w), []).append(w)
+    return groups
 
 
 # -- a class: the Bag ADT ---------------------------------------------------
@@ -113,39 +136,52 @@ class Bag:
     """
 
     def __init__(self, items=()):
-        raise NotImplementedError
+        self._counts = {}
+        self._size = 0
+        for item in items:
+            self.add(item)
 
     def add(self, item):
         """Put one more `item` in the bag."""
-        raise NotImplementedError
+        self._counts[item] = self._counts.get(item, 0) + 1
+        self._size += 1
 
     def remove(self, item):
         """Take one `item` out. Raise KeyError if there is none."""
-        raise NotImplementedError
+        if self._counts.get(item, 0) == 0:
+            raise KeyError(item)
+        self._counts[item] -= 1
+        self._size -= 1
+        if self._counts[item] == 0:
+            del self._counts[item]
 
     def count(self, item):
         """How many of `item` are in the bag (0 if none)."""
-        raise NotImplementedError
+        return self._counts.get(item, 0)
 
     def distinct(self):
         """How many different items are in the bag."""
-        raise NotImplementedError
+        return len(self._counts)
 
     def __len__(self):
-        raise NotImplementedError
+        return self._size
 
     def __contains__(self, item):
-        raise NotImplementedError
+        return item in self._counts
 
     def __iter__(self):
-        raise NotImplementedError
+        for item, n in self._counts.items():
+            for _ in range(n):
+                yield item
 
     def __eq__(self, other):
-        raise NotImplementedError
+        if not isinstance(other, Bag):
+            return NotImplemented
+        return self._counts == other._counts
 
     def __repr__(self):
         """ "Bag([...])" listing every item, repeats included, in sorted order."""
-        raise NotImplementedError
+        return f"Bag({sorted(self)!r})"
 
 
 # -- generators -------------------------------------------------------------
@@ -158,7 +194,9 @@ def countdown(n):
 
     This must be a generator: use `yield`, not a list.
     """
-    raise NotImplementedError
+    while n >= 1:
+        yield n
+        n -= 1
 
 
 def chunks(values, size):
@@ -168,4 +206,11 @@ def chunks(values, size):
 
     list(chunks([1, 2, 3, 4, 5], 2)) -> [[1, 2], [3, 4], [5]]
     """
-    raise NotImplementedError
+    if size < 1:
+        raise ValueError("size must be at least 1")
+    return _chunks(values, size)
+
+
+def _chunks(values, size):
+    for start in range(0, len(values), size):
+        yield values[start:start + size]
