@@ -94,7 +94,10 @@ def reverse_string(text):
 
     Slicing is allowed here — the recursion is the exercise, not the slicing.
     """
-    raise NotImplementedError
+    if len(text) <= 1:
+        return text
+    else:
+        return text[-1] + reverse_string(text[:-1])
 
 
 def is_palindrome(text):
@@ -104,7 +107,11 @@ def is_palindrome(text):
     strings are palindromes. Case and punctuation are **not** ignored:
     is_palindrome("aba") -> True ;  is_palindrome("Aba") -> False
     """
-    raise NotImplementedError
+    if len(text) <= 1:
+        return True
+    if text[0] != text[-1]:
+        return False
+    return is_palindrome(text[1:-1])
 
 
 def flatten(nested):
@@ -117,7 +124,12 @@ def flatten(nested):
     The shape of the data is recursive, so the function is too. Only `list` is
     treated as nesting — a string is a value, not a sequence to descend into.
     """
-    raise NotImplementedError
+    if not nested:
+        return []
+    if isinstance(nested, list):
+        return flatten(nested[0]) + flatten(nested[1:])
+    else:
+        return [nested]
 
 
 def merge_sorted(left, right):
@@ -132,7 +144,14 @@ def merge_sorted(left, right):
     This is the merge step of merge sort. Write it here in week 3 and you have
     already written half of `dsa/sorting.py` week 10.
     """
-    raise NotImplementedError
+    if not left:
+        return right
+    if not right:
+        return left
+    if left[0] <= right[0]:
+        return [left[0]] + merge_sorted(left[1:], right)
+    else:
+        return [right[0]] + merge_sorted(left, right[1:])
 
 
 # -- recursion that branches ----------------------------------------------
@@ -150,7 +169,13 @@ def hanoi(n, source="A", target="C", spare="B"):
     The solution is exactly 2**n - 1 moves, which is why n = 64 is not a
     homework question. Target: O(2**n) — unavoidably.
     """
-    raise NotImplementedError
+    if n == 1:
+        return [(source, target)]
+    else:
+        moves = hanoi(n - 1, source, spare, target)
+        moves.append((source, target))
+        moves.extend(hanoi(n - 1, spare, target, source))
+        return moves
 
 
 def subsets(items):
@@ -163,7 +188,13 @@ def subsets(items):
     2**n subsets, so the output order is up to you — the tests sort before
     comparing.
     """
-    raise NotImplementedError
+    if not items:
+        return [[]]
+    first = items[0]
+    rest = items[1:]
+    subsets_of_rest = subsets(rest)
+    with_first = [[first] + subset for subset in subsets_of_rest]
+    return subsets_of_rest + with_first
 
 
 def permutations(items):
@@ -175,4 +206,13 @@ def permutations(items):
     n! results. Order is up to you; the tests sort before comparing.
     Do not call itertools — that is the built-in this exercise reimplements.
     """
-    raise NotImplementedError
+    if not items:
+        return [[]]
+    first = items[0]
+    rest = items[1:]
+    perms_of_rest = permutations(rest)
+    result = []
+    for perm in perms_of_rest:
+        for i in range(len(perm) + 1):
+            result.append(perm[:i] + [first] + perm[i:])
+    return result
