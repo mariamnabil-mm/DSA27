@@ -35,7 +35,14 @@ def find(arr, target, size=None):
 
     Best case O(1), worst case O(n). Which inputs give each?
     """
-    raise NotImplementedError
+    if size is None:
+        size = len(arr)
+
+    for i in range(size):
+        if arr[i] == target:
+            return i
+
+    return -1
 
 
 def is_sorted(arr, size=None):
@@ -44,7 +51,14 @@ def is_sorted(arr, size=None):
     Empty and one-element arrays are sorted. Target: O(n), and stop at the
     first pair that is out of order.
     """
-    raise NotImplementedError
+    if size is None:
+        size = len(arr)
+
+    for i in range(size - 1):
+        if arr[i] > arr[i + 1]:
+            return False
+
+    return True
 
 
 # -- writing: elements shift ------------------------------------------------
@@ -96,7 +110,14 @@ def reverse_in_place(arr):
     Two indices, one from each end, swapping as they walk towards each other.
     Target: O(n) time, O(1) extra space.
     """
-    raise NotImplementedError
+    left = 0
+    right = len(arr) - 1
+
+    while left < right:
+        arr[left], arr[right] = arr[right], arr[left]
+
+        left += 1
+        right -= 1
 
 
 def rotate_left(arr, k):
@@ -107,8 +128,23 @@ def rotate_left(arr, k):
     Target: O(n) time and O(1) extra space. Hint: three reversals. Write a
     helper that reverses the slots between two indices.
     """
-    raise NotImplementedError
+    def reverse_range(arr, left, right):
+        while left < right:
+            arr[left], arr[right] = arr[right], arr[left]
 
+            left += 1
+            right -= 1
+
+    n = len(arr)
+
+    if n == 0:
+        return
+
+    k = k % n
+
+    reverse_range(arr, 0, k - 1)
+    reverse_range(arr, k, n - 1)
+    reverse_range(arr, 0, n - 1)
 
 # -- making new arrays ------------------------------------------------------
 
@@ -121,7 +157,12 @@ def resized(arr, new_length):
 
     Target: O(new_length).
     """
-    raise NotImplementedError
+    new_arr = Array(new_length)
+
+    for i in range(min(len(arr), new_length)):
+        new_arr[i] = arr[i]
+
+    return new_arr
 
 
 def merge_sorted(a, b):
@@ -130,7 +171,35 @@ def merge_sorted(a, b):
     Walk both with one index each, always taking the smaller front value.
     Target: O(len(a) + len(b)). This is half of merge sort (Week 10).
     """
-    raise NotImplementedError
+    new_arr = Array(len(a) + len(b))
+
+    i = 0
+    j = 0
+    k = 0
+
+    while i < len(a) and j < len(b):
+
+        if a[i] <= b[j]:
+            new_arr[k] = a[i]
+            i += 1
+
+        else:
+            new_arr[k] = b[j]
+            j += 1
+
+        k += 1
+
+    while i < len(a):
+        new_arr[k] = a[i]
+        i += 1
+        k += 1
+
+    while j < len(b):
+        new_arr[k] = b[j]
+        j += 1
+        k += 1
+
+    return new_arr
 
 
 # -- two dimensions in one --------------------------------------------------
@@ -148,4 +217,17 @@ def transpose_flat(arr, rows, cols):
 
     Raises ValueError when len(arr) != rows * cols. Target: O(rows * cols).
     """
-    raise NotImplementedError
+    if len(arr) != rows * cols:
+        raise ValueError("array size does not match matrix dimensions")
+
+    new_arr = Array(rows * cols)
+
+    for r in range(rows):
+        for c in range(cols):
+
+            old_index = r * cols + c
+            new_index = c * rows + r
+
+            new_arr[new_index] = arr[old_index]
+
+    return new_arr
