@@ -41,7 +41,10 @@ class DynamicArray:
 
         Call `_resize(self._capacity * self.growth)` when full.
         """
-        raise NotImplementedError
+        if self._size == self._capacity:
+            self._resize(self._capacity * self.growth)
+        self._block[self._size] = value
+        self._size += 1
 
     def insert_at(self, index, value):
         """Insert at `index`, shifting the rest right. Target: O(n).
@@ -49,32 +52,64 @@ class DynamicArray:
         Raises IndexError unless 0 <= index <= len(self), as `insert_at` does
         in Week 2 and in the linked list. Inserting at len(self) appends.
         """
-        raise NotImplementedError
+        if not 0 <= index <= self._size:
+            raise IndexError(index)
+        if self._size == self._capacity:
+            self._resize(self._capacity * self.growth)
+        for i in range(self._size, index, -1):
+            self._block[i] = self._block[i - 1]
+        self._block[index] = value
+        self._size += 1
+
 
     def pop(self, index=-1):
         """Remove and return the value at `index`. Target: O(n), O(1) at the end.
 
         Raises IndexError when empty.
         """
-        raise NotImplementedError
+        if self._size == 0:
+            raise IndexError("pop from empty DynamicArray")
+        if index < 0:
+            index += self._size
+        if not 0 <= index < self._size:
+            raise IndexError("index out of range")
+        value = self._block[index]
+        for i in range(index, self._size - 1):
+            self._block[i] = self._block[i + 1]
+        self._size -= 1
+        self._block[self._size] = None
+        return value
 
     def _resize(self, capacity):
         """Move every element into a fresh block of `capacity` slots.
 
         Remember to increment `self.resize_count` — the notebook plots it.
         """
-        raise NotImplementedError
+        new_block = make_block(capacity)
+        for i in range(self._size):
+            new_block[i] = self._block[i]
+        self._block = new_block
+        self._capacity = capacity
+        self.resize_count += 1
 
     def __len__(self):
         return self._size
 
     def __getitem__(self, index):
         """Target: O(1). Support negative indices; raise IndexError otherwise."""
-        raise NotImplementedError
-
+        if index < 0:
+            index += self._size
+        if not 0 <= index < self._size:
+            raise IndexError(index)
+        return self._block[index]
+    
     def __setitem__(self, index, value):
         """a[index] = value. Target: O(1). Same indices, and errors, as __getitem__."""
-        raise NotImplementedError
+        if index < 0:
+            index += self._size
+        if not 0 <= index < self._size:
+            raise IndexError("index out of range")
+        self._block[index] = value
 
     def __iter__(self):
         for i in range(self._size):

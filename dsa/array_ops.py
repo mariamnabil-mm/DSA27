@@ -61,7 +61,14 @@ def insert_at(arr, size, index, value):
 
     Target: O(n) — O(size - index) shifts. Inserting at the end costs O(1).
     """
-    raise NotImplementedError
+    if size == len(arr):
+        raise OverflowError("array is full")
+    if not 0 <= index <= size:
+        raise IndexError("index out of range")
+    for i in range(size, index, -1):
+        arr[i] = arr[i - 1]
+    arr[index] = value
+    return size + 1
 
 
 def remove_at(arr, size, index):
@@ -74,7 +81,13 @@ def remove_at(arr, size, index):
 
     Target: O(n) — O(size - index - 1) shifts.
     """
-    raise NotImplementedError
+    if not 0 <= index < size:
+        raise IndexError("index out of range")
+    value = arr[index]
+    for i in range(index, size - 1):
+        arr[i] = arr[i + 1]
+    arr[size - 1] = None
+    return value
 
 
 def reverse_in_place(arr):

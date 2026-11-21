@@ -23,15 +23,21 @@ class Stack:
 
     def push(self, value):
         """Add to the top. Target: O(1) amortised."""
-        raise NotImplementedError
+        self._items.append(value)
 
     def pop(self):
         """Remove and return the top. Target: O(1). Raises IndexError when empty."""
-        raise NotImplementedError
+        if self.is_empty():
+            raise IndexError("pop from empty Stack")
+        # pop() with no argument removes the last element: nothing shifts
+        return self._items.pop()
 
     def peek(self):
         """Return the top without removing it. Raises IndexError when empty."""
-        raise NotImplementedError
+        if self.is_empty():
+            raise IndexError("peek from empty Stack")
+        # read the last used slot, but do NOT remove it
+        return self._items[len(self._items) - 1]
 
     def is_empty(self):
         return len(self._items) == 0
@@ -55,7 +61,21 @@ def is_balanced(text):
 
     The canonical first use of a stack. Target: O(n).
     """
-    raise NotImplementedError
+    partner = {")": "(", "]": "[", "}": "{"}
+    opens = Stack()
+    for ch in text:
+        if ch in "([{":
+            opens.push(ch)
+        elif ch in ")]}":
+            # check 1: a closer with nothing open to match
+            if opens.is_empty():
+                return False
+            # check 2: the closer must match the most recent opener
+            if opens.pop() != partner[ch]:
+                return False
+    # check 3: nothing may be left open at the end
+    return opens.is_empty()
+
 
 
 def infix_to_postfix(tokens):
@@ -63,4 +83,34 @@ def infix_to_postfix(tokens):
 
     Target: O(n). Handles + - * / and parentheses.
     """
-    raise NotImplementedError
+    precedence = {"+": 1, "-": 1, "*": 2, "/": 2}
+    output = []                      # the result: a plain list is fine here
+    operators = Stack()              # the waiting siding: our own Stack
+
+    for token in tokens:
+        if token in precedence:
+            # pop every operator of HIGHER OR EQUAL precedence, stopping at "("
+            while (not operators.is_empty()
+                   and operators.peek() != "("
+                   and precedence[operators.peek()] >= precedence[token]):
+                output.append(operators.pop())
+            operators.push(token)
+        elif token == "(":
+            operators.push(token)
+        elif token == ")":
+            # pop to the output until we reach the matching "("
+            while not operators.is_empty() and operators.peek() != "(":
+                output.append(operators.pop())
+            if operators.is_empty():
+                raise ValueError("unmatched ')'")
+            operators.pop()          # throw the "(" away
+        else:
+            output.append(token)     # a number goes straight through
+
+    # end of input: everything still waiting leaves
+    while not operators.is_empty():
+        top = operators.pop()
+        if top == "(":
+            raise ValueError("unmatched '('")
+        output.append(top)
+    return output

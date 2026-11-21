@@ -38,7 +38,7 @@ from __future__ import annotations
 
 from dsa.array import Array
 
-
+from dsa.stack import Stack
 # -- the grammar this module implements -----------------------------------
 #
 #   expr   := term (('+' | '-') term)*
@@ -155,7 +155,29 @@ def evaluate_postfix(tokens):
     Pair this with `dsa.stack.infix_to_postfix` and you have a complete
     calculator without ever building a tree.
     """
-    raise NotImplementedError
+    values = Stack()
+    for token in tokens:
+        if token in ("+", "-", "*", "/"):
+            if len(values) < 2:
+                raise ValueError("operator without two operands")
+            right = values.pop()
+            left = values.pop()
+            if token == "+":
+                values.push(left + right)
+            elif token == "-":
+                values.push(left - right)
+            elif token == "*":
+                values.push(left * right)
+            else:
+                values.push(left / right)
+        else:
+            if "." in token:
+                values.push(float(token))
+            else:
+                values.push(int(token))
+    if len(values) != 1:
+        raise ValueError("malformed postfix expression")
+    return values.pop()
 
 
 # -- stage 2b: tokens -> tree, using recursion ----------------------------

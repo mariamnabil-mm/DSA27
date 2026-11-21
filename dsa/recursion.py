@@ -30,7 +30,11 @@ def factorial(n):
 
     Raises ValueError for negative n. Target: O(n) time, O(n) stack.
     """
-    raise NotImplementedError
+    
+    if n == 0:
+        return 1
+    else:
+        return n * factorial(n - 1)
 
 
 def sum_digits(n):
@@ -40,7 +44,10 @@ def sum_digits(n):
 
     Target: O(log n) — one frame per digit.
     """
-    raise NotImplementedError
+    if n == 0:
+        return 0
+    else:
+        return (n % 10) + sum_digits(n // 10)
 
 
 def gcd(a, b):
@@ -50,9 +57,12 @@ def gcd(a, b):
 
     The oldest algorithm still in use. Target: O(log min(a, b)).
     """
-    raise NotImplementedError
+    if b == 0:
+        return a
+    else:
+        return gcd(b, a % b)
 
-
+    
 def power(base, exponent):
     """base ** exponent by *fast* exponentiation, for exponent >= 0.
 
@@ -63,7 +73,15 @@ def power(base, exponent):
 
     Target: **O(log n)**, not O(n). Doing it in O(n) passes none of the point.
     """
-    raise NotImplementedError
+    if exponent == 0:
+        return 1
+    else:
+        half = power(base, exponent // 2)
+
+        if exponent % 2 == 0:
+            return half * half
+        else:
+            return base * half * half
 
 
 # -- recursion over sequences ---------------------------------------------

@@ -38,7 +38,10 @@ class LinkedList:
 
     def push_front(self, value):
         """Insert at the head. Target: O(1)."""
-        raise NotImplementedError
+        node = Node(value)
+        node.next = self.head
+        self.head = node
+        self._size += 1
 
     def append(self, value):
         """Insert at the tail. Target: O(n) without a tail pointer.
@@ -46,14 +49,33 @@ class LinkedList:
         Challenge: add a `_tail` reference and get this to O(1). What does
         that cost you in `pop_front` and in `remove`?
         """
-        raise NotImplementedError
+        new_node = Node(value)
+        if self.head is None:
+            self.head = new_node
+        else:
+            node = self.head
+            while node.next is not None:
+                node = node.next
+            node.next = new_node
+        self._size += 1
 
     def insert_at(self, index, value):
         """Insert so that the new node ends up at `index`. Target: O(n).
 
         Raises IndexError unless 0 <= index <= len(self).
-        """
-        raise NotImplementedError
+            """
+        if not 0 <= index <= self._size:
+            raise IndexError("index out of range")
+        if index == 0:
+            self.push_front(value)
+            return
+        previous = self.head
+        for _ in range(index - 1):
+            previous = previous.next
+        node = Node(value)
+        node.next = previous.next
+        previous.next = node
+        self._size += 1
 
     # -- removing -------------------------------------------------------
 
@@ -62,27 +84,58 @@ class LinkedList:
 
         Raises IndexError when empty.
         """
-        raise NotImplementedError
+        if self.head is None:
+            raise IndexError("pop from empty list")
+        value = self.head.value
+        self.head = self.head.next
+        self._size -= 1
+        return value
 
     def remove(self, value):
         """Remove the first node holding `value`. Target: O(n).
 
         Returns True when something was removed, False otherwise.
         """
-        raise NotImplementedError
+        previous = None
+        node = self.head
+        while node is not None:
+            if node.value == value:
+                if previous is None:
+                    self.head = node.next
+                else:
+                    previous.next = node.next
+                self._size -= 1
+                return True
+            previous = node
+            node = node.next
+        return False
 
     # -- reading --------------------------------------------------------
 
     def find(self, value):
         """Return the index of the first node holding `value`, else -1."""
-        raise NotImplementedError
+        node = self.head
+        index = 0
+        while node is not None:
+            if node.value == value:
+                return index
+            node = node.next
+            index += 1
+        return -1
 
     def reverse(self):
         """Reverse the list in place. Target: O(n) time, O(1) extra space.
 
         The classic three-pointer problem. Draw it before you code it.
         """
-        raise NotImplementedError
+        previous = None
+        node = self.head
+        while node is not None:
+            next_node = node.next
+            node.next = previous
+            previous = node
+            node = next_node
+        self.head = previous
 
     # -- Python protocol ------------------------------------------------
 
@@ -103,7 +156,12 @@ class LinkedList:
         Contrast with `dsa.dynamic_array.DynamicArray.__getitem__`, which is
         O(1). Same interface, completely different cost.
         """
-        raise NotImplementedError
+        if not 0 <= index < self._size:
+            raise IndexError("index out of range")
+        node = self.head
+        for _ in range(index):
+            node = node.next
+        return node.value
 
     def __repr__(self):
         return "LinkedList([" + ", ".join(repr(v) for v in self) + "])"

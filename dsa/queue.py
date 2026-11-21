@@ -23,14 +23,17 @@ class SlowQueue:
 
     def enqueue(self, value):
         """Add to the back. O(1)."""
-        raise NotImplementedError
+        self._items.append(value)
 
     def dequeue(self):
         """Remove from the front. O(n) here — every element shifts left.
 
         Raises IndexError when empty.
         """
-        raise NotImplementedError
+        if len(self._items) == 0:
+            raise IndexError("dequeue from empty queue")
+        return self._items.pop(0)
+
 
     def __len__(self):
         return len(self._items)
@@ -56,11 +59,36 @@ class CircularQueue:
         Challenge: grow the ring when it fills, rather than raising. Careful —
         a naive copy scrambles the order once the data has wrapped around.
         """
-        raise NotImplementedError
+        # 1. full? grow FIRST, before computing the slot
+        if self._size == self._capacity:
+            self._grow(max(1, 2 * self._capacity))
+        # 2. the back of the ring: computed, not stored
+        tail = (self._head + self._size) % self._capacity
+        self._block[tail] = value
+        # 3. one more item; head does not move
+        self._size += 1
 
     def dequeue(self):
         """Remove from the front. Target: O(1). Raises IndexError when empty."""
-        raise NotImplementedError
+        if self._size == 0:
+            raise IndexError("dequeue from empty queue")
+        # 2. keep the value BEFORE clearing the slot
+        value = self._block[self._head]
+        self._block[self._head] = None
+        # 3. head moves forward and wraps with %
+        self._head = (self._head + 1) % self._capacity
+        self._size -= 1
+        return value
+
+    def _grow(self, capacity):
+        """Copy into a bigger block IN QUEUE ORDER, then switch all three fields."""
+        new_block = Array(capacity)
+        for i in range(self._size):
+            # the i-th item of the queue lives at (head + i) % OLD capacity
+            new_block[i] = self._block[(self._head + i) % self._capacity]
+        self._block = new_block
+        self._head = 0                 # the queue now starts at slot 0
+        self._capacity = capacity      # and every % now wraps at the new size
 
     def is_empty(self):
         return self._size == 0
